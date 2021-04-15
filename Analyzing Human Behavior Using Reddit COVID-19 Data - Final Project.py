@@ -1,3 +1,11 @@
+import praw
+import pandas as pd
+import numpy as np
+import nltk
+from nltk.corpus import sentiwordnet as swn
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
 # -*- coding: utf-8 -*-
 """
 Created on Mon Apr  6 15:27:15 2020
@@ -5,16 +13,9 @@ Created on Mon Apr  6 15:27:15 2020
 @author: ptrda
 """
 
-import praw
-import pandas as pd
-import numpy as np
-import nltk
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
-from nltk.corpus import sentiwordnet as swn
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
 
 # Opening the CONFIG file and getting all sensitive info.
 
@@ -91,8 +92,8 @@ posts_data["Post Sentiment Score"] = np.nan
 for i in range(0, len(posts_data["title"])):
     title_words = posts_data["title"][i].replace(':', '').replace('.', '').replace(',', '')\
                .replace('-', ' ').replace('(', '').replace(')', '').replace("'", "")\
-               .replace('“', '').replace('”', '').replace('!', '').lower()        
-    
+               .replace('“', '').replace('”', '').replace('!', '').lower()
+
     token_title = nltk.word_tokenize(title_words)
     tag_title = nltk.pos_tag(token_title)
     score_pos = 0
@@ -117,7 +118,7 @@ for i in range(0, len(posts_data["title"])):
 
 posts_data = posts_data.sort_values(by = 'Post Sentiment Score', ascending = False)
 posts_data = posts_data.reset_index(drop = True)
-    
+
 pos_posts = pd.DataFrame(posts_data[0:10])
 neutral_posts = pd.DataFrame(posts_data[10:20])
 neg_posts = pd.DataFrame(posts_data[20:30])
@@ -140,11 +141,11 @@ poscomm = ""
 for i in range(0, len(pos_posts["Top 10 Comments"])):
     for r in range(0, len(pos_posts["Top 10 Comments"][i])):
         poscomm += pos_posts["Top 10 Comments"][i][r] + " "
-        
+
 text_poscomm = poscomm.replace(':', '').replace('.', '').replace(',', '')\
        .replace('-', ' ').replace('(', '').replace(')', '').replace("[", "").replace("]", "")\
-       .replace('“', '').replace('”', '').replace('!', '').lower()        
-    
+       .replace('“', '').replace('”', '').replace('!', '').lower()
+
 token = nltk.word_tokenize(text_poscomm)
 tag = nltk.pos_tag(token)
 for word in tag:
@@ -158,19 +159,19 @@ for word in tag:
 
 print("\nFor positive posts, the positive comment sentiment score is ", poscomm_score_pos)
 print("\nFor positive posts, the negative comment sentiment score is ", poscomm_score_neg)
-    
-    
+
+
 neutcomm_score_pos = 0
 neutcomm_score_neg = 0
 neutcomm = ""
 for i in range(0, len(neutral_posts["Top 10 Comments"])):
     for r in range(0, len(neutral_posts["Top 10 Comments"][i])):
         neutcomm += neutral_posts["Top 10 Comments"][i][r] + " "
-        
+
 text_neutcomm = neutcomm.replace(':', '').replace('.', '').replace(',', '')\
        .replace('-', ' ').replace('(', '').replace(')', '').replace("[", "").replace("]", "")\
-       .replace('“', '').replace('”', '').replace('!', '').lower()        
-    
+       .replace('“', '').replace('”', '').replace('!', '').lower()
+
 token = nltk.word_tokenize(text_neutcomm)
 tag = nltk.pos_tag(token)
 for word in tag:
@@ -192,11 +193,11 @@ negcomm = ""
 for i in range(0, len(neg_posts["Top 10 Comments"])):
     for r in range(0, len(neg_posts["Top 10 Comments"][i])):
         negcomm += neg_posts["Top 10 Comments"][i][r] + " "
-        
+
 text_negcomm = negcomm.replace(':', '').replace('.', '').replace(',', '')\
        .replace('-', ' ').replace('(', '').replace(')', '').replace("[", "").replace("]", "")\
-       .replace('“', '').replace('”', '').replace('!', '').lower()        
-    
+       .replace('“', '').replace('”', '').replace('!', '').lower()
+
 token = nltk.word_tokenize(text_negcomm)
 tag = nltk.pos_tag(token)
 for word in tag:
@@ -209,7 +210,7 @@ for word in tag:
         negcomm_score_neg += swn.senti_synset(word[0] + '.a.01').neg_score()
 
 print("\nFor negative posts, the positive comment sentiment score is ", negcomm_score_pos)
-print("\nFor negative posts, the negative comment sentiment score is ", negcomm_score_neg)   
+print("\nFor negative posts, the negative comment sentiment score is ", negcomm_score_neg)
 
 
 # Bringing in stopwords.
@@ -224,12 +225,12 @@ for line in file:
 postitle_text = ''
 for i in range(0, len(pos_posts["title"])):
     postitle_text += pos_posts["title"][i] + " "
-    
+
 postitle_list = postitle_text.replace(':', '').replace('.', '').replace(',', '')\
            .replace('-', ' ').replace('(', '').replace(')', '')\
            .replace('“', '').replace('”', '').replace('!', '').replace('#', '').lower().strip().split()
 rm_stop_postitle = []
-for word in postitle_list: 
+for word in postitle_list:
     try:
         int(word)
     except:
@@ -238,10 +239,10 @@ for word in postitle_list:
                 rm_stop_postitle.append(word)
 
 postitle_wc = ' '.join(rm_stop_postitle)
-    
+
 poscomm_list = text_poscomm.strip().split()
 rm_stop_poscomm = []
-for word in poscomm_list: 
+for word in poscomm_list:
     try:
         int(word)
     except:
@@ -255,12 +256,12 @@ poscomm_wc = ' '.join(rm_stop_poscomm)
 neuttitle_text = ''
 for i in range(0, len(neutral_posts["title"])):
     neuttitle_text += neutral_posts["title"][i] + " "
-    
+
 neuttitle_list = neuttitle_text.replace(':', '').replace('.', '').replace(',', '')\
            .replace('-', ' ').replace('(', '').replace(')', '')\
            .replace('“', '').replace('”', '').replace('!', '').replace('#', '').lower().strip().split()
 rm_stop_neuttitle = []
-for word in neuttitle_list: 
+for word in neuttitle_list:
     try:
         int(word)
     except:
@@ -269,10 +270,10 @@ for word in neuttitle_list:
                 rm_stop_neuttitle.append(word)
 
 neuttitle_wc = ' '.join(rm_stop_neuttitle)
-    
+
 neutcomm_list = text_neutcomm.strip().split()
 rm_stop_neutcomm = []
-for word in neutcomm_list: 
+for word in neutcomm_list:
     try:
         int(word)
     except:
@@ -286,12 +287,12 @@ neutcomm_wc = ' '.join(rm_stop_neutcomm)
 negtitle_text = ''
 for i in range(0, len(neg_posts["title"])):
     negtitle_text += neg_posts["title"][i] + " "
-    
+
 negtitle_list = negtitle_text.replace(':', '').replace('.', '').replace(',', '')\
            .replace('-', ' ').replace('(', '').replace(')', '')\
            .replace('“', '').replace('”', '').replace('!', '').replace('#', '').lower().strip().split()
 rm_stop_negtitle = []
-for word in negtitle_list: 
+for word in negtitle_list:
     try:
         int(word)
     except:
@@ -300,10 +301,10 @@ for word in negtitle_list:
                 rm_stop_negtitle.append(word)
 
 negtitle_wc = ' '.join(rm_stop_negtitle)
-    
+
 negcomm_list = text_negcomm.strip().split()
 rm_stop_negcomm = []
-for word in negcomm_list: 
+for word in negcomm_list:
     try:
         int(word)
     except:
@@ -315,49 +316,45 @@ negcomm_wc = ' '.join(rm_stop_negcomm)
 
 # Generating all SIX word clouds.
 
-wc_title = WordCloud(height = 2000, width = 3000, background_color='white', max_words = 100, collocations = False)
-wc_comm = WordCloud(height = 2000, width = 3000, background_color='white', max_words = 500, collocations = False)
+wc_title = WordCloud(height = 2000, width = 3000, background_color='white',
+max_words = 100, collocations = False)
+wc_comm = WordCloud(height = 2000, width = 3000, background_color='white',
+max_words = 500, collocations = False)
 
 wc_title.generate(postitle_wc)
 wc_title.to_file("Positive Titles.png")
 plt.imshow(wc_title)
 plt.axis('off')
-plt.show()   
+plt.show()
 
 wc_comm.generate(poscomm_wc)
 wc_comm.to_file("Comments for Positive Titles.png")
 plt.imshow(wc_comm)
 plt.axis('off')
-plt.show()     
+plt.show()
 
 
 wc_title.generate(neuttitle_wc)
 wc_title.to_file("Neutral Titles.png")
 plt.imshow(wc_title)
 plt.axis('off')
-plt.show()   
+plt.show()
 
 wc_comm.generate(neutcomm_wc)
 wc_comm.to_file("Comments for Neutral Titles.png")
 plt.imshow(wc_comm)
 plt.axis('off')
-plt.show()     
+plt.show()
 
 
 wc_title.generate(negtitle_wc)
 wc_title.to_file("Negative Titles.png")
 plt.imshow(wc_title)
 plt.axis('off')
-plt.show()   
+plt.show()
 
 wc_comm.generate(negcomm_wc)
 wc_comm.to_file("Comments for Negative Titles.png")
 plt.imshow(wc_comm)
 plt.axis('off')
-plt.show()         
-    
-    
-    
-    
-    
-    
+plt.show()
